@@ -1,0 +1,29 @@
+# 튀김 조리 완료 판단 AI - 의존성
+
+# PyTorch
+torch>=2.0.0
+torchvision>=0.15.0
+
+# 이미지 처리
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# 데이터 처리
+numpy>=1.24.0
+pandas>=2.0.0
+
+# 설정 관리
+PyYAML>=6.0
+
+# 학습 모니터링
+tensorboard>=2.14.0
+tqdm>=4.66.0
+
+# 추론 최적화 (선택)
+# onnx>=1.14.0
+# onnxruntime>=1.16.0
+
+# 개발 도구
+# pytest>=7.4.0
+# black>=23.0.0
+# flake8>=6.1.0

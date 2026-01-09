@@ -1,0 +1,42 @@
+# 튀김 종류별 조리 파라미터 (색상 기반 판단용)
+recipes:
+  적어튀김:
+    target_time: 180
+    min_time: 120
+    color_threshold: 25
+    description: "작은 생선 튀김"
+
+  돈까스:
+    target_time: 240
+    min_time: 180
+    color_threshold: 30
+    description: "두꺼운 돈까스"
+
+  치킨:
+    target_time: 300
+    min_time: 240
+    color_threshold: 35
+    description: "뼈있는 치킨"
+
+  고구마튀김:
+    target_time: 150
+    min_time: 100
+    color_threshold: 20
+    description: "얇은 고구마"
+
+  튀김만두:
+    target_time: 180
+    min_time: 120
+    color_threshold: 25
+    description: "냉동 만두"
+
+  새우튀김:
+    target_time: 120
+    min_time: 80
+    color_threshold: 22
+    description: "새우"
+
+default:
+  target_time: 180
+  min_time: 120
+  color_threshold: 25

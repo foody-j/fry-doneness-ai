@@ -1,0 +1,78 @@
+# 튀김 조리 완료 판단 AI - 기본 설정
+
+# 데이터
+data:
+  root: "pot1"
+  image_size: [224, 224]
+  val_split: 0.2
+
+# 모델
+model:
+  backbone: "efficientnet_b2"
+  pretrained: true
+  freeze_backbone: true
+  num_classes: 3
+  num_food_types: 10
+  use_temporal: false
+
+  # 특징 차원
+  image_feature_dim: 256
+  bubble_feature_dim: 6
+  bubble_output_dim: 16
+  food_embedding_dim: 16
+
+  # 시계열 (use_temporal: true일 때)
+  temporal_hidden_dim: 128
+  max_seq_len: 4
+
+# 학습
+training:
+  batch_size: 16
+  num_epochs: 100
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+
+  # 스케줄러
+  scheduler: "cosine"
+  min_lr: 0.000001
+
+  # Early stopping
+  early_stopping_patience: 15
+
+  # 체크포인트
+  save_every: 10
+
+# 기포 특징 추출
+bubble_features:
+  min_blob_area: 50
+  max_blob_area: 5000
+  oil_hsv_lower: [15, 50, 50]
+  oil_hsv_upper: [35, 255, 255]
+
+# 탈탈 감지
+lift_detection:
+  metal_hsv_lower: [0, 0, 140]
+  metal_hsv_upper: [180, 40, 255]
+  food_hsv_lower: [12, 60, 90]
+  food_hsv_upper: [25, 200, 200]
+  lift_threshold: 0.02
+  food_threshold: 0.01
+
+# 튀김 종류 매핑
+food_types:
+  적어튀김: 0
+  돈까스: 1
+  치킨: 2
+  고구마튀김: 3
+  튀김만두: 4
+  생선까스: 5
+  새우튀김: 6
+  오징어튀김: 7
+  야채튀김: 8
+  기타: 9
+
+# 분류 라벨
+labels:
+  0: "조리중"      # COOKING
+  1: "거의완료"    # ALMOST_DONE
+  2: "완료"        # DONE
