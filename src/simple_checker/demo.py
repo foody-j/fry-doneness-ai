@@ -44,12 +44,10 @@ def _load_images(image_paths: List[Path]) -> List[Tuple[Path, float]]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Color-based frying checker demo")
     parser.add_argument("--session", type=str, required=True, help="Session dir (food_type dir)")
-    parser.add_argument("--recipe", type=str, required=True, help="Recipe name")
     parser.add_argument("--camera_dir", type=str, default="camera_0")
     parser.add_argument("--use_lift_sequence", action="store_true")
     parser.add_argument("--max_frames", type=int, default=None)
-    parser.add_argument("--verbose", action="store_true", help="Enable debug output")
-    parser.add_argument("--log_file", type=str, default=None, help="Save log to JSON")
+    parser.add_argument("--color_threshold", type=float, default=25.0)
     args = parser.parse_args()
 
     session_dir = Path(args.session)
@@ -70,13 +68,10 @@ def main() -> None:
     if not image_paths:
         raise SystemExit("No images found for demo")
 
-    checker = SimpleColorChecker(verbose=args.verbose)
-    checker.set_recipe(args.recipe)
+    checker = SimpleColorChecker(color_threshold=args.color_threshold)
 
     print("=== 색상 기반 튀김 완료 판단 테스트 ===")
-    print(f"Recipe: {args.recipe}")
-    print(f"Target time: {checker.params.get('target_time')}초")
-    print(f"Color threshold: {checker.params.get('color_threshold')}")
+    print(f"Color threshold: {checker.color_threshold}")
 
     timeline = _load_images(image_paths)
     for idx, (path, ts) in enumerate(timeline, start=1):
@@ -85,26 +80,28 @@ def main() -> None:
             print(f"Skip: {path.name} (load failed)")
             continue
 
-        result = checker.check(image, ts)
-        if result["status"] == "조리시작":
-            color = result["color"]
+        if idx == 1:
+            baseline = checker.set_baseline(image)
+            color = baseline.get("color")
             if color:
                 print(f"[{idx}차 탈탈] {path.name}")
-                print(f"  상태: {result['status']}")
+                print("  기준 색상 저장")
                 print(
                     f"  기준 색상: H={color['h_mean']:.1f}, "
                     f"S={color['s_mean']:.1f}, V={color['v_mean']:.1f}"
                 )
+            else:
+                print(f"[{idx}차 탈탈] {path.name} (baseline 실패)")
             continue
 
-        print(f"[{idx}차 탈탈] {path.name} (+{result['elapsed_sec']}초)")
-        print(f"  색상 변화: {result['color_diff']}")
-        print(f"  시간 진행: {result['time_progress']}%")
-        print(f"  상태: {result['status']}")
+        result = checker.measure(image)
+        if "error" in result:
+            print(f"[{idx}차 탈탈] {path.name} (error: {result['error']})")
+            continue
 
-    if args.log_file:
-        checker.save_log(args.log_file)
-        print(f"\nLog saved: {args.log_file}")
+        print(f"[{idx}차 탈탈] {path.name}")
+        print(f"  색상 변화: {result['color_diff']}")
+        print(f"  진행률: {result['progress_pct']}%")
 
 
 if __name__ == "__main__":

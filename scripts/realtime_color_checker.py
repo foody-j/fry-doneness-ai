@@ -30,6 +30,7 @@ def main() -> None:
     parser.add_argument("--source", default="0", help="Camera index or video path")
     parser.add_argument("--recipe", required=True, help="Recipe name (e.g., 적어튀김)")
     parser.add_argument("--min_confidence", type=float, default=0.6)
+    parser.add_argument("--color_threshold", type=float, default=25.0)
     parser.add_argument("--max_lifts", type=int, default=0, help="Stop after N lifts (0=unlimited)")
     args = parser.parse_args()
 
@@ -39,8 +40,7 @@ def main() -> None:
         raise SystemExit(f"Failed to open source: {args.source}")
 
     detector = LiftDetector()
-    checker = SimpleColorChecker()
-    checker.set_recipe(args.recipe)
+    checker = SimpleColorChecker(color_threshold=args.color_threshold)
 
     lift_count = 0
     last_lift_time = 0.0
@@ -66,13 +66,20 @@ def main() -> None:
             ):
                 last_lift_time = now
                 lift_count += 1
-                status = checker.check(frame, now)
-
-                print(
-                    f"[Lift {lift_count}] status={status.get('status')} "
-                    f"color_diff={status.get('color_diff')} "
-                    f"elapsed={status.get('elapsed_sec')}"
-                )
+                if lift_count == 1:
+                    baseline = checker.set_baseline(frame)
+                    print(
+                        f"[Lift {lift_count}] baseline_set={baseline.get('baseline_set')}"
+                    )
+                else:
+                    result = checker.measure(frame)
+                    if "error" in result:
+                        print(f"[Lift {lift_count}] error={result['error']}")
+                    else:
+                        print(
+                            f"[Lift {lift_count}] color_diff={result.get('color_diff')} "
+                            f"progress={result.get('progress_pct')}"
+                        )
 
                 if args.max_lifts and lift_count >= args.max_lifts:
                     break
