@@ -159,11 +159,9 @@
 ![Confusion Matrix](confusion_matrix.png)
 
 ### 5.6 예측 결과 시각화
-#### Ground Truth
-![Validation Labels](val_batch0_labels.jpg)
+![Validation Predictions Grid](val_predictions_grid.jpg)
 
-#### Model Predictions
-![Validation Predictions](val_batch0_pred.jpg)
+*Validation 데이터셋에 대한 모델 예측 결과 (16개 샘플)*
 
 ---
 
